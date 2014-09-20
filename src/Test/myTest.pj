@@ -1,0 +1,229 @@
+package Test;
+import pj.Pyjama;
+import Uni.*;
+public class myTest {
+	public static void main(String[] args) {
+			myTest t = new myTest();
+			t.ParallelWithoutCritical();
+			t.ParallelWithCritical();
+			t.Sequential();
+			t.ParallelUniversal();
+	}
+	public static void ParallelWithoutCritical() {
+			Tester myCounter = new Tester();
+			Pyjama.omp_set_num_threads(4);
+			double start_time = Pyjama.omp_get_wtick();
+		 	//#omp parallel sections shared(myCounter)
+	        {
+	        	//#omp section 
+	        	{
+	        		for(int i=0; i<10000; i++){
+	        			if (0 == (i%2)){
+	        				myCounter.inc();
+	        			} else {
+	        				myCounter.dec();
+	        			}
+	        		}	
+	        	}
+	        	//#omp section 
+	        	{
+	        		for(int i=0; i<10000; i++){
+	        			if (0 == (i%2)){
+	        				myCounter.inc();
+	        			} else {
+	        				myCounter.dec();
+	        			}
+	        		}	
+	        	}
+				//#omp section 
+	        	{
+	        		for(int i=0; i<10000; i++){
+	        			if (0 == (i%2)){
+	        				myCounter.inc();
+	        			} else {
+	        				myCounter.dec();
+	        			}
+	        		}	
+	        	}
+				//#omp section 
+	        	{
+	        		for(int i=0; i<10000; i++){
+	        			if (0 == (i%2)){
+	        				myCounter.inc();
+	        			} else {
+	        				myCounter.dec();
+	        			}
+	        		}	
+	        	}
+	        	
+	        }
+	         double end_time = Pyjama.omp_get_wtick();
+	        System.out.print("Parallel Without Critical Result:");
+	        System.out.print(myCounter.get());
+	        System.out.println("(Time spent is:"+(end_time-start_time)+")");
+	}
+
+	/////////////////////////////////////////
+		public static void Sequential() {
+			Tester myCounter = new Tester();
+			Pyjama.omp_set_num_threads(4);
+			double start_time = Pyjama.omp_get_wtick();
+		 
+	        		for(int i=0; i<10000; i++){
+	        			if (0 == (i%2)){
+	        				myCounter.inc();
+	        			} else {
+	        				myCounter.dec();
+	        			}
+	        		}
+	        		for(int i=0; i<10000; i++){
+	        			if (0 == (i%2)){
+	        				myCounter.inc();
+	        			} else {
+	        				myCounter.dec();
+	        			}
+	        		}	
+	        		for(int i=0; i<10000; i++){
+	        			if (0 == (i%2)){
+	        				myCounter.inc();
+	        			} else {
+	        				myCounter.dec();
+	        			}
+	        		}	
+	        		for(int i=0; i<10000; i++){
+	        			if (0 == (i%2)){
+	        				myCounter.inc();
+	        			} else {
+	        				myCounter.dec();
+	        			}
+	        		}	
+	         double end_time = Pyjama.omp_get_wtick();
+	        System.out.print("Sequential Result:");
+	        System.out.print(myCounter.get());
+	        System.out.println("(Time spent is:"+(end_time-start_time)+")");
+	}
+	/////////////////////////////////////////
+		public static void ParallelWithCritical() {
+			Tester myCounter = new Tester();
+			Pyjama.omp_set_num_threads(4);
+			double start_time = Pyjama.omp_get_wtick();
+		 	//#omp parallel sections shared(myCounter)
+	        {
+	        	//#omp section 
+	        	{
+	        		for(int i=0; i<10000; i++){
+	        			//#omp critical 
+	        			{
+	        				if (0 == (i%2)){
+	        					myCounter.inc();
+	        				} else {
+	        					myCounter.dec();
+	        				}
+	        			}
+	        		}	
+	        	}
+	        	//#omp section 
+	        	{
+	        		for(int i=0; i<10000; i++){
+	        			//#omp critical 
+	        			{
+	        				if (0 == (i%2)){
+	        					myCounter.inc();
+	        				} else {
+	        					myCounter.dec();
+	        				}
+	        			}
+	        		}	
+	        	}
+				//#omp section 
+	        	{
+	        		for(int i=0; i<10000; i++){
+	        			//#omp critical 
+	        			{
+	        				if (0 == (i%2)){
+	        					myCounter.inc();
+	        				} else {
+	        					myCounter.dec();
+	        				}
+	        			}
+	        		}		
+	        	}
+				//#omp section 
+	        	{
+	        		for(int i=0; i<10000; i++){
+	        			//#omp critical 
+	        			{
+	        				if (0 == (i%2)){
+	        					myCounter.inc();
+	        				} else {
+	        					myCounter.dec();
+	        				}
+	        			}
+	        		}	
+	        	}
+	        	
+	        }
+	         double end_time = Pyjama.omp_get_wtick();
+	        System.out.print("Parallel Critical Result:");
+	        System.out.print(myCounter.get());
+	        System.out.println("(Time spent is:"+(end_time-start_time)+")");
+	}
+	/////////////////////////////////////////
+	public static void ParallelUniversal() {
+			Tester myCounter = new Tester();
+			Pyjama.omp_set_num_threads(4);
+			double start_time = Pyjama.omp_get_wtick();
+			/***********************/
+			LockFreeUniversal lf = new LockFreeUniversal(4, myCounter);
+			Invocation inc_lf = new Invocation(11);
+			Invocation dec_lf = new Invocation(22);
+			/***********************/
+		 	//#omp parallel sections shared(lf, inc_lf, dec_lf)
+	        {
+	        	//#omp section 
+	        	{
+	        		for(int i=0; i<10000; i++){
+	        			if (0 == (i%2)){
+	        				lf.apply(inc_lf);
+	        			} else {
+	        				lf.apply(dec_lf);
+	        			}
+	        		}	
+	        	}
+	        	//#omp section 
+	        	{
+	        		for(int i=0; i<10000; i++){
+	        			if (0 == (i%2)){
+	        				lf.apply(inc_lf);
+	        			} else {
+	        				lf.apply(dec_lf);
+	        			}
+	        		}	
+	        	}
+	        	//#omp section 
+	        	{
+	        		for(int i=0; i<10000; i++){
+	        			if (0 == (i%2)){
+	        				lf.apply(inc_lf);
+	        			} else {
+	        				lf.apply(dec_lf);
+	        			}
+	        		}	
+	        	}
+	        	//#omp section 
+	        	{
+	        		for(int i=0; i<10000; i++){
+	        			if (0 == (i%2)){
+	        				lf.apply(inc_lf);
+	        			} else {
+	        				lf.apply(dec_lf);
+	        			}
+	        		}	
+	        	}
+	        }
+	        double end_time = Pyjama.omp_get_wtick();
+	        System.out.print("Parallel Univeral Result:");
+	        System.out.print(((Tester)(lf.fetchObj())).get());
+	        System.out.println("(Time spent is:"+(end_time-start_time)+")");
+	}
+}
